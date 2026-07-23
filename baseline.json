@@ -1,0 +1,1118 @@
+{
+  "meta": {
+    "product": "Holonic CodeIntent",
+    "baseline_id": "CodeIntent 2026.06.r1",
+    "client": "First National (illustrative sample)",
+    "job": "Core Deposit Platform -> Java Spring Boot",
+    "disclaimer": "Sample baseline for product-surface demonstration. The production engine generates this record from the customer source codebase.",
+    "codebase": {
+      "source_loc": 2100000,
+      "target_loc": 1380000,
+      "programs": 1323,
+      "copybooks": 318,
+      "services": 96,
+      "classes": 2140,
+      "traceability_pct": 98.6,
+      "equivalence_coverage_pct": 94.2,
+      "equivalence_records_passed": 1248,
+      "equivalence_records_failed_open": 0,
+      "sme_review_open": 4,
+      "orphaned_excluded": 31,
+      "unresolved_blockers": 0,
+      "test_artifacts": 312,
+      "build": "Passing - Maven, JDK 21"
+    },
+    "interface": {
+      "mode": "read-only evidence interface",
+      "writes": false
+    }
+  },
+  "rules": {
+    "R-CTRL-006": {
+      "behavior": "Dormant Account Accrual Suppression",
+      "rule": "Dormant accounts do not accrue daily interest.",
+      "origin": "src",
+      "originText": "Source-Derived — extracted directly from the legacy control branch and confirmed by deterministic equivalence.",
+      "ruleSrc": "ACCT-INTEREST.CBL · paragraph 2100-ACCRUE-DAILY",
+      "clause": "Preserve dormant-account accrual suppression.",
+      "status": "verified",
+      "valStatus": "Verified · deterministic equivalence",
+      "srcFile": "ACCT-INTEREST.CBL",
+      "tgtFile": "InterestAccrualService.java",
+      "evId": "EQV-2272",
+      "evResult": "Pass",
+      "det": true,
+      "ev": [
+        [
+          "Result",
+          "Equivalence — Pass"
+        ],
+        [
+          "Coverage",
+          "Branch + path"
+        ],
+        [
+          "Last validated",
+          "2026-06-08"
+        ],
+        [
+          "Versions",
+          "src r9 → tgt v1.0"
+        ]
+      ],
+      "impact": "Bounded impact: 1 behavior, 3 call sites. No downstream accrual behavior affected.",
+      "srcLines": [
+        [
+          195,
+          "       2100-ACCRUE-DAILY.",
+          "tok-c"
+        ],
+        [
+          196,
+          "           MOVE ACCT-COLLECTED-BAL TO WS-PRINCIPAL.",
+          ""
+        ],
+        [
+          197,
+          "           IF ACCT-STATUS-CD = 'DORM'",
+          "tok-k"
+        ],
+        [
+          198,
+          "              MOVE ZERO TO WS-DAILY-ACCRUAL",
+          "tok-k"
+        ],
+        [
+          199,
+          "              MOVE 'Y' TO WS-ACCRUAL-SUPPRESSED",
+          "tok-k"
+        ],
+        [
+          200,
+          "              GO TO 2100-EXIT",
+          "tok-k"
+        ],
+        [
+          201,
+          "           END-IF.",
+          "tok-k"
+        ],
+        [
+          202,
+          "           COMPUTE WS-DAILY-ACCRUAL =",
+          ""
+        ],
+        [
+          203,
+          "               (WS-PRINCIPAL * WS-DAILY-RATE) / 365.",
+          ""
+        ],
+        [
+          204,
+          "       2100-EXIT.   EXIT.",
+          "tok-c"
+        ]
+      ],
+      "srcHL": [
+        197,
+        201
+      ],
+      "tgtLines": [
+        [
+          40,
+          "    /** Reg-bound daily accrual; dormant accounts are suppressed. */",
+          ""
+        ],
+        [
+          41,
+          "    BigDecimal accrueDaily(Account account, MoneyRate dailyRate) {",
+          ""
+        ],
+        [
+          42,
+          "        BigDecimal principal = account.collectedBalance();",
+          ""
+        ],
+        [
+          43,
+          "",
+          ""
+        ],
+        [
+          44,
+          "        if (account.status() == AccountStatus.DORMANT) {",
+          "tok-k"
+        ],
+        [
+          45,
+          "            audit.suppressed(account, Reason.DORMANT);",
+          "tok-k"
+        ],
+        [
+          46,
+          "            return BigDecimal.ZERO;",
+          "tok-k"
+        ],
+        [
+          47,
+          "        }",
+          "tok-k"
+        ],
+        [
+          48,
+          "        return principal.multiply(dailyRate.value())",
+          ""
+        ],
+        [
+          49,
+          "                        .divide(DAYS_IN_YEAR, ROUNDING);",
+          ""
+        ]
+      ],
+      "tgtHL": [
+        44,
+        47
+      ]
+    },
+    "R-CALC-002": {
+      "behavior": "Daily Interest Accrual Basis",
+      "rule": "Daily interest accrues on the collected balance using the 365-day method.",
+      "origin": "src",
+      "originText": "Source-Derived — computation extracted from the legacy COMPUTE statement and confirmed deterministically.",
+      "ruleSrc": "ACCT-INTEREST.CBL · paragraph 2100-ACCRUE-DAILY",
+      "clause": "Preserve daily accrual basis (collected balance, 365-day).",
+      "status": "verified",
+      "valStatus": "Verified · deterministic equivalence",
+      "srcFile": "ACCT-INTEREST.CBL",
+      "tgtFile": "InterestAccrualService.java",
+      "evId": "EQV-2268",
+      "evResult": "Pass",
+      "det": true,
+      "ev": [
+        [
+          "Result",
+          "Equivalence — Pass"
+        ],
+        [
+          "Coverage",
+          "Path + numeric"
+        ],
+        [
+          "Last validated",
+          "2026-06-08"
+        ],
+        [
+          "Versions",
+          "src r9 → tgt v1.0"
+        ]
+      ],
+      "impact": "Bounded impact: 1 behavior, 5 call sites across statement &amp; posting.",
+      "srcLines": [
+        [
+          195,
+          "       2100-ACCRUE-DAILY.",
+          "tok-c"
+        ],
+        [
+          196,
+          "           MOVE ACCT-COLLECTED-BAL TO WS-PRINCIPAL.",
+          ""
+        ],
+        [
+          197,
+          "           IF ACCT-STATUS-CD = 'DORM'",
+          ""
+        ],
+        [
+          198,
+          "              MOVE ZERO TO WS-DAILY-ACCRUAL",
+          ""
+        ],
+        [
+          199,
+          "              MOVE 'Y' TO WS-ACCRUAL-SUPPRESSED",
+          ""
+        ],
+        [
+          200,
+          "              GO TO 2100-EXIT",
+          ""
+        ],
+        [
+          201,
+          "           END-IF.",
+          ""
+        ],
+        [
+          202,
+          "           COMPUTE WS-DAILY-ACCRUAL =",
+          "tok-k"
+        ],
+        [
+          203,
+          "               (WS-PRINCIPAL * WS-DAILY-RATE) / 365.",
+          "tok-k"
+        ],
+        [
+          204,
+          "       2100-EXIT.   EXIT.",
+          "tok-c"
+        ]
+      ],
+      "srcHL": [
+        202,
+        203
+      ],
+      "tgtLines": [
+        [
+          42,
+          "        BigDecimal principal = account.collectedBalance();",
+          ""
+        ],
+        [
+          43,
+          "",
+          ""
+        ],
+        [
+          44,
+          "        if (account.status() == AccountStatus.DORMANT) {",
+          ""
+        ],
+        [
+          45,
+          "            return BigDecimal.ZERO;",
+          ""
+        ],
+        [
+          46,
+          "        }",
+          ""
+        ],
+        [
+          47,
+          "        return principal.multiply(dailyRate.value())",
+          "tok-k"
+        ],
+        [
+          48,
+          "                        .divide(DAYS_IN_YEAR, ROUNDING);",
+          "tok-k"
+        ]
+      ],
+      "tgtHL": [
+        47,
+        48
+      ]
+    },
+    "R-REG-014": {
+      "behavior": "Reg DD Annual Percentage Yield",
+      "rule": "APY is disclosed under Reg DD using the Truth-in-Savings annual formula.",
+      "origin": "reg",
+      "originText": "Regulatory Text — bound to Reg DD (12 CFR 1030, Appendix A). Computation source-derived; the regulatory citation is expert-authored and on file.",
+      "ruleSrc": "REG-DD.CBL · 3300-COMPUTE-APY  ·  citation: 12 CFR 1030 App. A",
+      "clause": "Preserve Reg DD APY computation and disclosure rounding.",
+      "status": "verified",
+      "valStatus": "Verified · equivalence + expert citation",
+      "srcFile": "REG-DD.CBL",
+      "tgtFile": "AnnualPercentageYieldCalculator.java",
+      "evId": "EQV-2240",
+      "evResult": "Pass",
+      "det": true,
+      "ev": [
+        [
+          "Result",
+          "Equivalence — Pass"
+        ],
+        [
+          "Authority",
+          "Reg DD · expert-cited"
+        ],
+        [
+          "Last validated",
+          "2026-06-07"
+        ],
+        [
+          "Versions",
+          "src r4 → tgt v1.0"
+        ]
+      ],
+      "impact": "Bounded impact: 1 behavior, 2 call sites. Disclosure surface only.",
+      "srcLines": [
+        [
+          88,
+          "       3300-COMPUTE-APY.",
+          "tok-c"
+        ],
+        [
+          89,
+          "           COMPUTE WS-APY ROUNDED =",
+          ""
+        ],
+        [
+          90,
+          "             ((1 + (WS-DIV-RATE / WS-DAYS)) ** WS-DAYS) - 1.",
+          ""
+        ],
+        [
+          91,
+          "           MOVE WS-APY TO DISCLOSURE-APY.",
+          ""
+        ]
+      ],
+      "srcHL": [
+        89,
+        90
+      ],
+      "tgtLines": [
+        [
+          60,
+          "    /** Reg DD / Truth-in-Savings APY (12 CFR 1030, App. A). */",
+          ""
+        ],
+        [
+          61,
+          "    BigDecimal annualPercentageYield(Rate dividend, int days) {",
+          "tok-k"
+        ],
+        [
+          62,
+          "        return ONE.add(dividend.over(days)).pow(days)",
+          "tok-k"
+        ],
+        [
+          63,
+          "                  .subtract(ONE).setScale(2, HALF_EVEN);",
+          "tok-k"
+        ]
+      ],
+      "tgtHL": [
+        61,
+        63
+      ]
+    },
+    "R-INF-118": {
+      "behavior": "ACH Return R10 Routing",
+      "rule": "An ACH return with reason code R10 routes to the manual review queue.",
+      "origin": "llm",
+      "originText": "CodeIntent-inferred · awaiting review — proposed from naming and flow, not confirmed by a deterministic source branch. Held as a governed boundary until SME sign-off.",
+      "ruleSrc": "ACH-RTN.CBL · inferred from 4400-RETURN-HANDLER (no explicit R10 branch)",
+      "clause": "Pending — no contract clause until reviewed.",
+      "status": "review",
+      "valStatus": "Needs Review · no equivalence record yet",
+      "srcFile": "ACH-RTN.CBL",
+      "tgtFile": "AchReturnHandler.java",
+      "evId": "R-INF-118",
+      "evResult": "Needs Review",
+      "det": false,
+      "ev": [
+        [
+          "Result",
+          "Not yet validated"
+        ],
+        [
+          "Origin",
+          "CodeIntent-inferred"
+        ],
+        [
+          "Proposed",
+          "2026-06-06"
+        ],
+        [
+          "Owner",
+          "SME — Payments"
+        ]
+      ],
+      "impact": "Held boundary: not bound to a verified source branch. Listed under Exceptions until reviewed.",
+      "srcLines": [
+        [
+          240,
+          "       4400-RETURN-HANDLER.",
+          "tok-c"
+        ],
+        [
+          241,
+          "           EVALUATE ACH-RETURN-CD",
+          ""
+        ],
+        [
+          242,
+          "             WHEN 'R01' PERFORM 4410-NSF-RETURN",
+          ""
+        ],
+        [
+          243,
+          "             WHEN OTHER PERFORM 4490-GENERIC-RETURN",
+          "tok-k"
+        ],
+        [
+          244,
+          "           END-EVALUATE.",
+          ""
+        ]
+      ],
+      "srcHL": [
+        243,
+        243
+      ],
+      "tgtLines": [
+        [
+          70,
+          "    // INFERRED: R10 → manual review (no explicit legacy branch)",
+          ""
+        ],
+        [
+          71,
+          "    void onReturn(AchReturn r) {",
+          ""
+        ],
+        [
+          72,
+          "        if (r.code() == ReturnCode.R10) {",
+          "tok-k"
+        ],
+        [
+          73,
+          "            reviewQueue.enqueue(r);   // awaiting SME confirmation",
+          "tok-k"
+        ],
+        [
+          74,
+          "        }",
+          ""
+        ]
+      ],
+      "tgtHL": [
+        72,
+        73
+      ]
+    },
+    "R-NEW-031": {
+      "behavior": "Accrual Audit Event (net-new)",
+      "rule": "Each accrual posting emits an AccrualAudited domain event.",
+      "origin": "net",
+      "originText": "Net-New Intent — no legacy origin. Added under the output model for observability and governed by contract, not equivalence.",
+      "ruleSrc": "none (net-new) · introduced by Holonic Java SB Standard Model v1.0",
+      "clause": "Net-new audit event for accrual posting (Contract v1.2).",
+      "status": "net",
+      "valStatus": "Contract conformance · no source equivalence",
+      "srcFile": "— (net-new) —",
+      "tgtFile": "AccrualAudited.java",
+      "evId": "Contract v1.2",
+      "evResult": "Conformant",
+      "det": false,
+      "ev": [
+        [
+          "Result",
+          "Contract conformance — Pass"
+        ],
+        [
+          "Type",
+          "Net-new intent"
+        ],
+        [
+          "Approved",
+          "Contract v1.2"
+        ],
+        [
+          "Owner",
+          "Architecture"
+        ]
+      ],
+      "impact": "Additive only: 0 source behaviors changed. Emits an event on an existing posting path.",
+      "srcLines": [
+        [
+          1,
+          "  — No source artifact —",
+          ""
+        ],
+        [
+          2,
+          "  This behavior has no legacy origin. It is introduced",
+          ""
+        ],
+        [
+          3,
+          "  by the output model and traced to a contract clause,",
+          ""
+        ],
+        [
+          4,
+          "  not to a source branch. See target →",
+          "tok-c"
+        ]
+      ],
+      "srcHL": [],
+      "tgtLines": [
+        [
+          12,
+          "/** Net-new: emitted when an accrual is posted (Contract v1.2). */",
+          ""
+        ],
+        [
+          13,
+          "public record AccrualAudited(",
+          "tok-k"
+        ],
+        [
+          14,
+          "        AccountId account,",
+          "tok-k"
+        ],
+        [
+          15,
+          "        Money amount,",
+          "tok-k"
+        ],
+        [
+          16,
+          "        Instant postedAt) implements DomainEvent {}",
+          "tok-k"
+        ]
+      ],
+      "tgtHL": [
+        13,
+        16
+      ]
+    }
+  },
+  "rule_order": [
+    "R-CTRL-006",
+    "R-CALC-002",
+    "R-REG-014",
+    "R-INF-118",
+    "R-NEW-031"
+  ],
+  "scope": [
+    {
+      "src": "ACCT-INTEREST.CBL",
+      "intent": "Dormant Account Accrual Suppression",
+      "tgt": "InterestAccrualService.java",
+      "type": "Business logic",
+      "status": "verified",
+      "ev": "EQV-2272",
+      "rule": "R-CTRL-006",
+      "owner": "Auto-verified"
+    },
+    {
+      "src": "ACCT-INTEREST.CBL",
+      "intent": "Daily Interest Accrual Basis",
+      "tgt": "InterestAccrualService.java",
+      "type": "Business logic",
+      "status": "verified",
+      "ev": "EQV-2268",
+      "rule": "R-CALC-002",
+      "owner": "Auto-verified"
+    },
+    {
+      "src": "REG-DD.CBL",
+      "intent": "Reg DD Annual Percentage Yield",
+      "tgt": "AnnualPercentageYieldCalculator.java",
+      "type": "Business logic · regulatory",
+      "status": "verified",
+      "ev": "EQV-2240",
+      "rule": "R-REG-014",
+      "owner": "Expert-cited"
+    },
+    {
+      "src": "PAYHIST.CBL",
+      "intent": "Payment History Lookup",
+      "tgt": "PaymentHistoryRepository.java",
+      "type": "Data access",
+      "status": "verified",
+      "ev": "EQV-2280",
+      "rule": null,
+      "owner": "Auto-verified"
+    },
+    {
+      "src": "STMT-GEN.CBL",
+      "intent": "Statement Generation",
+      "tgt": "StatementRenderingService.java",
+      "type": "Business logic",
+      "status": "verified",
+      "ev": "EQV-2291",
+      "rule": null,
+      "owner": "Auto-verified"
+    },
+    {
+      "src": "NSF-FEE.CBL",
+      "intent": "Overdraft / NSF Fee Assessment",
+      "tgt": "OverdraftFeeService.java",
+      "type": "Business logic",
+      "status": "verified",
+      "ev": "EQV-2255",
+      "rule": null,
+      "owner": "Auto-verified"
+    },
+    {
+      "src": "DDA-POST.CBL",
+      "intent": "Ledger Posting",
+      "tgt": "LedgerPostingAdapter.java",
+      "type": "Port / adapter",
+      "status": "allowed",
+      "ev": "Contract v1.1",
+      "rule": null,
+      "owner": "Eng — Platform"
+    },
+    {
+      "src": "— net-new —",
+      "intent": "Accrual Audit Event",
+      "tgt": "AccrualAudited.java",
+      "type": "Net-new intent",
+      "status": "net",
+      "ev": "Contract v1.2",
+      "rule": "R-NEW-031",
+      "owner": "Architecture"
+    },
+    {
+      "src": "ACH-RTN.CBL",
+      "intent": "ACH Return R10 Routing",
+      "tgt": "AchReturnHandler.java",
+      "type": "Business logic",
+      "status": "review",
+      "ev": "R-INF-118",
+      "rule": "R-INF-118",
+      "owner": "SME — Payments"
+    },
+    {
+      "src": "OLD-RPT-9.CBL",
+      "intent": "—",
+      "tgt": "—",
+      "type": "Orphaned",
+      "status": "orphaned",
+      "ev": "Excluded",
+      "rule": null,
+      "owner": "No runtime ref"
+    }
+  ],
+  "validation": [
+    {
+      "ev": "EQV-2272",
+      "unit": "R-CTRL-006 · Dormant accrual",
+      "type": "Deterministic equivalence",
+      "result": "Pass",
+      "scope": "Branch + path",
+      "sv": "r9",
+      "tv": "v1.0",
+      "rev": "Auto",
+      "last": "2026-06-08",
+      "rule": "R-CTRL-006"
+    },
+    {
+      "ev": "EQV-2268",
+      "unit": "R-CALC-002 · Accrual basis",
+      "type": "Deterministic equivalence",
+      "result": "Pass",
+      "scope": "Path + numeric",
+      "sv": "r9",
+      "tv": "v1.0",
+      "rev": "Auto",
+      "last": "2026-06-08",
+      "rule": "R-CALC-002"
+    },
+    {
+      "ev": "EQV-2240",
+      "unit": "R-REG-014 · Reg DD APY",
+      "type": "Deterministic equivalence",
+      "result": "Pass",
+      "scope": "Numeric + rounding",
+      "sv": "r4",
+      "tv": "v1.0",
+      "rev": "Expert",
+      "last": "2026-06-07",
+      "rule": "R-REG-014"
+    },
+    {
+      "ev": "EQV-2280",
+      "unit": "Payment History Lookup",
+      "type": "Data mapping validation",
+      "result": "Pass",
+      "scope": "Schema + keys",
+      "sv": "r2",
+      "tv": "v1.0",
+      "rev": "Auto",
+      "last": "2026-06-08",
+      "rule": null
+    },
+    {
+      "ev": "CC-0114",
+      "unit": "Ledger Posting adapter",
+      "type": "Contract conformance",
+      "result": "Pass",
+      "scope": "Allowed change v1.1",
+      "sv": "r6",
+      "tv": "v1.0",
+      "rev": "Eng — Platform",
+      "last": "2026-06-07",
+      "rule": null
+    },
+    {
+      "ev": "BP-0337",
+      "unit": "NSF fee branch set",
+      "type": "Branch preservation",
+      "result": "Pass",
+      "scope": "12 branches",
+      "sv": "r3",
+      "tv": "v1.0",
+      "rev": "Auto",
+      "last": "2026-06-08",
+      "rule": null
+    },
+    {
+      "ev": "CC-0120",
+      "unit": "R-NEW-031 · Accrual audit",
+      "type": "Contract conformance",
+      "result": "Pass",
+      "scope": "Net-new v1.2",
+      "sv": "—",
+      "tv": "v1.0",
+      "rev": "Architecture",
+      "last": "2026-06-07",
+      "rule": "R-NEW-031"
+    },
+    {
+      "ev": "R-INF-118",
+      "unit": "ACH Return R10 routing",
+      "type": "Human-reviewed exception",
+      "result": "Open",
+      "scope": "Inferred — unbound",
+      "sv": "r5",
+      "tv": "v1.0",
+      "rev": "SME — Payments",
+      "last": "—",
+      "rule": "R-INF-118"
+    }
+  ],
+  "exceptions": [
+    {
+      "sev": "info",
+      "tag": "Orphaned",
+      "art": "OLD-RPT-9.CBL",
+      "type": "Orphaned source code",
+      "desc": "Legacy batch report program with no runtime reference in the analyzed codebase.",
+      "reason": "No JCL step, copybook, or call path reaches this program across the ingested codebase.",
+      "action": "Confirm exclusion or supply the missing call path if it runs out-of-band.",
+      "owner": "First National",
+      "status": "Excluded from target"
+    },
+    {
+      "sev": "review",
+      "tag": "CodeIntent-inferred",
+      "art": "R-INF-118 · ACH-RTN.CBL",
+      "type": "CodeIntent-inferred rule awaiting review",
+      "desc": "R10 → manual review queue was proposed from naming and flow, with no explicit legacy branch to confirm it.",
+      "reason": "The source uses a WHEN OTHER catch-all; the specific R10 behavior is not deterministically present.",
+      "action": "SME confirms intended R10 handling; on sign-off it becomes Expert-Authored with a contract clause.",
+      "owner": "SME — Payments",
+      "status": "Open — held boundary"
+    },
+    {
+      "sev": "review",
+      "tag": "SME clarification",
+      "art": "ACCT-INTEREST.CBL",
+      "type": "SME clarification required",
+      "desc": "Day-count convention for leap years is implicit in the legacy 365 divisor; behavior in a leap year is undocumented.",
+      "reason": "Source divides by a literal 365; no leap-year branch exists, so intended leap-year behavior cannot be derived.",
+      "action": "SME states the intended convention; equivalence target updates accordingly.",
+      "owner": "SME — Deposits",
+      "status": "Open — held boundary"
+    },
+    {
+      "sev": "info",
+      "tag": "Missing dependency",
+      "art": "CPYBK-RATE",
+      "type": "Missing copybook / dependency",
+      "desc": "Rate-table copybook referenced by two programs was not present in the delivered source set.",
+      "reason": "COPY CPYBK-RATE resolves to no file in the provided codebase.",
+      "action": "Supply the copybook to bind the two dependent rate behaviors; until then they are listed, not generated.",
+      "owner": "First National",
+      "status": "Awaiting artifact"
+    }
+  ],
+  "change_proposals": [
+    {
+      "change": "Add fee-waiver flag",
+      "src": "Developer PR #418",
+      "intent": "Accrual + Ledger Posting",
+      "impact": "No accrual impact; posting revalidation needed",
+      "status": "ready",
+      "rule": "R-CTRL-006",
+      "detail": "A fee-waiver flag is added to the account model. CodeIntent binds the change to accrual and posting. Accrual reads collected balance and status only, so it is unaffected; the posting adapter is an allowed change and is flagged for re-validation.",
+      "fan": {
+        "center": "Fee-waiver flag",
+        "sites": [
+          [
+            "Accrual",
+            1,
+            "ok"
+          ],
+          [
+            "Posting",
+            2,
+            "warn"
+          ],
+          [
+            "Statement",
+            1,
+            "ok"
+          ]
+        ]
+      }
+    },
+    {
+      "change": "Change ACH R10 routing",
+      "src": "LLM proposal · Claude Code",
+      "intent": "ACH Return Handling",
+      "impact": "Touches an unverified inferred rule",
+      "status": "review",
+      "rule": "R-INF-118",
+      "detail": "An LLM proposes routing R10 returns to a new queue. The bound intent (R-INF-118) is itself CodeIntent-inferred and not yet confirmed, so CodeIntent holds the change for SME review rather than verifying it against a baseline that doesn't exist yet.",
+      "fan": {
+        "center": "R10 routing",
+        "sites": [
+          [
+            "ACH return",
+            2,
+            "warn"
+          ],
+          [
+            "Review queue",
+            1,
+            "warn"
+          ]
+        ]
+      }
+    },
+    {
+      "change": "Add audit metadata",
+      "src": "Copilot · PR #421",
+      "intent": "Accrual Audit Event (net-new)",
+      "impact": "Contract conformance only",
+      "status": "accepted",
+      "rule": "R-NEW-031",
+      "detail": "Adds fields to the net-new AccrualAudited event. No source behavior is touched; the change is validated against Contract v1.2 and accepted.",
+      "fan": {
+        "center": "Audit metadata",
+        "sites": [
+          [
+            "Audit event",
+            1,
+            "ok"
+          ]
+        ]
+      }
+    },
+    {
+      "change": "Modify dormant logic",
+      "src": "Manual code edit",
+      "intent": "Dormant Account Accrual Suppression",
+      "impact": "Not behavior-preserving · EQV-2272",
+      "status": "blocked",
+      "rule": "R-CTRL-006",
+      "detail": "A manual edit removes the dormant-status guard in InterestAccrualService. CodeIntent re-runs the bound equivalence check: the change is not behavior-preserving — dormant accounts would begin accruing, and EQV-2272 no longer holds. It may be valid business policy, but it is not the approved baseline behavior. Routed to change governance: reject the change, or update the approved intent baseline — which retires EQV-2272 explicitly.",
+      "fan": {
+        "center": "Dormant logic edit",
+        "sites": [
+          [
+            "Accrual",
+            3,
+            "break"
+          ],
+          [
+            "Statement APY",
+            1,
+            "warn"
+          ],
+          [
+            "Audit",
+            1,
+            "ok"
+          ]
+        ]
+      }
+    }
+  ],
+  "qa_examples": [
+    {
+      "q": "How are dormant accounts handled in the modernized system?",
+      "answer": "Dormant accounts do not accrue daily interest. The legacy control branch that sets accrual to zero maps to InterestAccrualService.java lines 44–47. This behavior is source-derived and confirmed by deterministic equivalence record EQV-2272. No exceptions are open against it.",
+      "estatus": {
+        "cls": "",
+        "txt": "Source-derived · deterministic equivalence confirmed (EQV-2272)"
+      },
+      "cites": [
+        [
+          "src",
+          "Source",
+          "ACCT-INTEREST.CBL:197–201",
+          "R-CTRL-006"
+        ],
+        [
+          "tgt",
+          "Target",
+          "InterestAccrualService.java:44–47",
+          "R-CTRL-006"
+        ],
+        [
+          "rule",
+          "Rule",
+          "R-CTRL-006",
+          "R-CTRL-006"
+        ],
+        [
+          "ev",
+          "Evidence",
+          "EQV-2272",
+          "R-CTRL-006"
+        ],
+        [
+          "con",
+          "Contract",
+          "Preserve dormant-account accrual suppression",
+          "R-CTRL-006"
+        ]
+      ]
+    },
+    {
+      "q": "What happens if a dormant account's status changes after accrual runs?",
+      "answer": "Accrual re-evaluates status on each daily run, so a change to active before the next run resumes accrual from that run forward. What the legacy system did about the day the status changed mid-cycle is not deterministically present in the source — there is no branch for it — so that case is held as an SME clarification rather than assumed.",
+      "estatus": {
+        "cls": "warn",
+        "txt": "Partly governed boundary · one SME clarification open (leap-year / mid-cycle day-count)"
+      },
+      "cites": [
+        [
+          "rule",
+          "Rule",
+          "R-CTRL-006",
+          "R-CTRL-006"
+        ],
+        [
+          "ev",
+          "Evidence",
+          "EQV-2272",
+          "R-CTRL-006"
+        ],
+        [
+          "src",
+          "Source",
+          "ACCT-INTEREST.CBL:202–203",
+          "R-CALC-002"
+        ]
+      ]
+    },
+    {
+      "q": "Will adding a fee-waiver flag break interest accrual?",
+      "answer": "On the bound surface, no. Accrual reads the collected balance and account status only; a fee-waiver flag touches neither. Bounded impact is 1 behavior across 3 call sites, all source-derived and unaffected. One adjacent path — the ledger-posting adapter — is an allowed change under Contract v1.1 and should be re-validated if the waiver alters posting amounts. That re-validation is named, not assumed.",
+      "estatus": {
+        "cls": "",
+        "txt": "Deterministic where bound · 1 allowed-change adapter flagged for re-validation"
+      },
+      "cites": [
+        [
+          "rule",
+          "Rule",
+          "R-CTRL-006",
+          "R-CTRL-006"
+        ],
+        [
+          "ev",
+          "Evidence",
+          "EQV-2272",
+          "R-CTRL-006"
+        ],
+        [
+          "con",
+          "Contract",
+          "Ledger Posting — Allowed Change v1.1",
+          "R-NEW-031"
+        ]
+      ]
+    }
+  ],
+  "bindings": [
+    {
+      "symbol": "InterestAccrualService.accrueDaily",
+      "file": "InterestAccrualService.java",
+      "lines": [
+        41,
+        49
+      ],
+      "rules": [
+        "R-CTRL-006",
+        "R-CALC-002"
+      ],
+      "guard_lines": {
+        "R-CTRL-006": [
+          44,
+          47
+        ],
+        "R-CALC-002": [
+          48,
+          49
+        ]
+      }
+    },
+    {
+      "symbol": "AnnualPercentageYieldCalculator.annualPercentageYield",
+      "file": "AnnualPercentageYieldCalculator.java",
+      "lines": [
+        61,
+        64
+      ],
+      "rules": [
+        "R-REG-014"
+      ],
+      "guard_lines": {
+        "R-REG-014": [
+          61,
+          64
+        ]
+      }
+    },
+    {
+      "symbol": "AchReturnHandler.onReturn",
+      "file": "AchReturnHandler.java",
+      "lines": [
+        71,
+        75
+      ],
+      "rules": [
+        "R-INF-118"
+      ],
+      "guard_lines": {
+        "R-INF-118": [
+          72,
+          73
+        ]
+      }
+    },
+    {
+      "symbol": "AccrualAudited",
+      "file": "AccrualAudited.java",
+      "lines": [
+        13,
+        16
+      ],
+      "rules": [
+        "R-NEW-031"
+      ],
+      "guard_lines": {
+        "R-NEW-031": [
+          13,
+          16
+        ]
+      }
+    },
+    {
+      "symbol": "LedgerPostingAdapter.post",
+      "file": "LedgerPostingAdapter.java",
+      "lines": [
+        30,
+        55
+      ],
+      "rules": [],
+      "allowed_change": "Contract v1.1 - Ledger Posting adapter (CC-0114)"
+    }
+  ]
+}

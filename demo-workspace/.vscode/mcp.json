@@ -1,0 +1,9 @@
+{
+  "servers": {
+    "codeintent": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["../server.mjs"]
+    }
+  }
+}

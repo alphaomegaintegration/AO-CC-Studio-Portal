@@ -1,0 +1,23 @@
+{
+  "name": "codeintent-studio-product-build",
+  "version": "1.0.0",
+  "description": "Holonic CodeIntent Studio product-build demo with local MCP bridge",
+  "type": "module",
+  "main": "bridge.mjs",
+  "scripts": {
+    "studio": "node bridge.mjs",
+    "mcp": "node server.mjs",
+    "test:mcp": "node test.mjs"
+  },
+  "keywords": [
+    "codeintent",
+    "mcp",
+    "studio"
+  ],
+  "author": "Holonic",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "zod": "^4.4.3"
+  }
+}

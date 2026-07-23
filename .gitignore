@@ -1,0 +1,77 @@
+# Dependencies
+node_modules/
+.npm/
+.pnp
+.pnp.js
+jspm_packages/
+
+# npm/yarn/pnpm logs and debug output
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+logs/
+*.log
+
+# Alternative package managers (package-lock.json is the tracked lockfile)
+yarn.lock
+pnpm-lock.yaml
+bun.lockb
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets.json
+
+# Runtime / bridge output
+*.pid
+*.pid.lock
+.bridge-*
+tmp/
+temp/
+
+# Test and coverage output
+coverage/
+.nyc_output/
+test-output/
+*.tmp
+
+# Build output
+dist/
+build/
+out/
+
+# Caches
+.cache/
+.eslintcache
+.parcel-cache/
+.node_repl_history
+
+# Editor / IDE
+# Note: demo-workspace/.vscode/mcp.json is intentionally tracked (see README)
+.vscode/*
+!.vscode/extensions.json
+!.vscode/mcp.json
+.idea/
+*.swp
+*.swo
+*~
+
+# Source PDFs — docs live in docs/ as markdown.
+# The AO demo script was converted to docs/ao-client-demo-script.md;
+# the original PDF stays on disk locally but is not tracked.
+*.pdf
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini

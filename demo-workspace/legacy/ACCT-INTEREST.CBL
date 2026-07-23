@@ -1,0 +1,10 @@
+       2100-ACCRUE-DAILY.
+           MOVE ACCT-COLLECTED-BAL TO WS-PRINCIPAL.
+           IF ACCT-STATUS-CD = 'DORM'
+              MOVE ZERO TO WS-DAILY-ACCRUAL
+              MOVE 'Y' TO WS-ACCRUAL-SUPPRESSED
+              GO TO 2100-EXIT
+           END-IF.
+           COMPUTE WS-DAILY-ACCRUAL =
+               (WS-PRINCIPAL * WS-DAILY-RATE) / 365.
+       2100-EXIT.   EXIT.
