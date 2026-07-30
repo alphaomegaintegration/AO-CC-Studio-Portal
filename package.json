@@ -7,7 +7,9 @@
   "scripts": {
     "studio": "node bridge.mjs",
     "mcp": "node server.mjs",
-    "test:mcp": "node test.mjs"
+    "test:mcp": "node test.mjs",
+    "capture:golden": "node scripts/capture-golden.mjs",
+    "test": "node --test"
   },
   "keywords": [
     "codeintent",

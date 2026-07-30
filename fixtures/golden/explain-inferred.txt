@@ -1,0 +1,16 @@
+**R-INF-118 — ACH Return R10 Routing**
+Rule: An ACH return with reason code R10 routes to the manual review queue.
+Provenance: CodeIntent-inferred · awaiting review — proposed from naming and flow, not confirmed by a deterministic source branch. Held as a governed boundary until SME sign-off.
+Rule source: ACH-RTN.CBL · inferred from 4400-RETURN-HANDLER (no explicit R10 branch)
+Governance contract clause: Pending — no contract clause until reviewed.
+Validation: Needs Review · no equivalence record yet
+Evidence record: R-INF-118 — Needs Review
+Source: ACH-RTN.CBL lines 243–243
+Target: AchReturnHandler.java lines 72–73
+Evidence detail: Result: Not yet validated · Origin: CodeIntent-inferred · Proposed: 2026-06-06 · Owner: SME — Payments
+Bounded impact: Held boundary: not bound to a verified source branch. Listed under Exceptions until reviewed.
+
+⚠ This rule is CodeIntent-inferred and NOT yet confirmed by a deterministic source branch. It is a governed boundary held for SME review (owner: SME — Payments). Treat it as unverified.
+---
+Baseline: CodeIntent 2026.06.r1 · First National (illustrative sample)
+Interface: governed evidence interface (read-only) · Sample baseline for product-surface demonstration. The production engine generates this record from the customer source codebase.

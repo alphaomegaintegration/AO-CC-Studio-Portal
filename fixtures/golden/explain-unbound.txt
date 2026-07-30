@@ -1,0 +1,4 @@
+No rule in this baseline matches "zzzz nothing matches this query". The interface does not guess: if a behavior is not bound in the baseline, it is reported as unbound. Bound rules in this sample: R-CTRL-006, R-CALC-002, R-REG-014, R-INF-118, R-NEW-031.
+---
+Baseline: CodeIntent 2026.06.r1 · First National (illustrative sample)
+Interface: governed evidence interface (read-only) · Sample baseline for product-surface demonstration. The production engine generates this record from the customer source codebase.

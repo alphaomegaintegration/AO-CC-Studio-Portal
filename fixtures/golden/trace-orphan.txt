@@ -1,0 +1,4 @@
+**OLD-RPT-9.CBL** is ORPHANED in this baseline: no runtime reference reaches it across the ingested codebase. It was excluded from the target — listed, not silently dropped.
+---
+Baseline: CodeIntent 2026.06.r1 · First National (illustrative sample)
+Interface: governed evidence interface (read-only) · Sample baseline for product-surface demonstration. The production engine generates this record from the customer source codebase.

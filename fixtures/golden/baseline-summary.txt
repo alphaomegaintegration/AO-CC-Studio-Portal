@@ -1,0 +1,19 @@
+**CodeIntent 2026.06.r1** — Core Deposit Platform -> Java Spring Boot
+
+Source codebase: 2.10M LOC · 1323 programs · 318 copybooks
+Target codebase: 1.38M LOC · 96 services · 2140 classes
+Source-to-target traceability: 98.6% · Source-derived equivalence coverage: 94.2%
+Equivalence records: 1248 passed · 0 open failures
+Open SME review items: 4 (governed boundaries) · Orphaned/excluded: 31 · Unresolved blockers: 0
+Build: Passing - Maven, JDK 21 · Test artifacts: 312 generated
+
+Coverage percentages describe what is traceable and conformant against the source-traceable specification — different kinds of evidence are never collapsed into one number.
+
+**Open governed boundaries:**
+- [Orphaned] OLD-RPT-9.CBL: Orphaned source code — Excluded from target (owner: First National)
+- [CodeIntent-inferred] R-INF-118 · ACH-RTN.CBL: CodeIntent-inferred rule awaiting review — Open — held boundary (owner: SME — Payments)
+- [SME clarification] ACCT-INTEREST.CBL: SME clarification required — Open — held boundary (owner: SME — Deposits)
+- [Missing dependency] CPYBK-RATE: Missing copybook / dependency — Awaiting artifact (owner: First National)
+---
+Baseline: CodeIntent 2026.06.r1 · First National (illustrative sample)
+Interface: governed evidence interface (read-only) · Sample baseline for product-surface demonstration. The production engine generates this record from the customer source codebase.
