@@ -190,7 +190,7 @@ the correctness criterion for the tools.mjs extraction."
 **Files:**
 - Create: `tools.mjs`
 - Create: `tools.test.mjs`
-- Read (do not yet modify): `server.mjs:28-130` (helpers), `server.mjs:136-345` (tool bodies)
+- Modify: `server.mjs` — source the move from `server.mjs:28-130` (helpers) and `server.mjs:136-345` (tool bodies), then replace lines 21–345 with the thin shell in Step 5. Both halves land in one commit.
 
 **Interfaces:**
 - Consumes: `CASES` from `fixtures/cases.mjs`; `fixtures/golden/*.txt`.
