@@ -13,6 +13,7 @@ import { extname, join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { TOOLS, B as BASELINE } from "./tools.mjs";
 import { routeQuestion } from "./router.mjs";
+import { parseJsonBody, validateToolArgs } from "./http-shared.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.PORT || 8787);
@@ -46,7 +47,7 @@ async function readBody(req) {
   const chunks = [];
   for await (const chunk of req) chunks.push(chunk);
   const raw = Buffer.concat(chunks).toString('utf8');
-  return raw ? JSON.parse(raw) : {};
+  return parseJsonBody(raw);
 }
 
 function serveStatic(req, res) {
@@ -84,7 +85,9 @@ const server = http.createServer(async (req, res) => {
       const question = String(body.question || '').trim();
       if (!question) return json(res, 400, { error: 'Missing question' });
       const routed = routeQuestion(question);
-      const text = await TOOLS[routed.tool].run(routed.args);
+      const askParsed = validateToolArgs(routed.tool, routed.args);
+      if (!askParsed.success) return json(res, 400, { error: askParsed.error.issues[0]?.message ?? 'Invalid arguments' });
+      const text = await TOOLS[routed.tool].run(askParsed.data);
       return json(res, 200, { question, routed, tool: routed.tool, text });
     }
 
@@ -93,13 +96,16 @@ const server = http.createServer(async (req, res) => {
       if (!body.tool) return json(res, 400, { error: 'Missing tool' });
       const t = TOOLS[body.tool];
       if (!t) return json(res, 404, { error: 'Unknown tool' });
-      const text = await t.run(body.args || {});
+      const parsed = validateToolArgs(body.tool, body.args);
+      if (!parsed.success) return json(res, 400, { error: parsed.error.issues[0]?.message ?? 'Invalid arguments' });
+      const text = await t.run(parsed.data);
       return json(res, 200, { tool: body.tool, text });
     }
 
     if (req.method === 'GET') return serveStatic(req, res);
     return json(res, 405, { error: 'Method not allowed' });
   } catch (err) {
+    if (err.statusCode) return json(res, err.statusCode, { error: err.message });
     console.error('[bridge] error', err);
     return json(res, 500, { error: err.message || String(err) });
   }

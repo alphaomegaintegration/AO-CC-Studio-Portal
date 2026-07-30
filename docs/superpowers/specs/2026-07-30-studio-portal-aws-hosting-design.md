@@ -59,6 +59,17 @@ One CloudFront distribution, two origins.
 Region: **us-east-1** for everything. Required if a CloudFront ACM certificate is added
 later (§9); keeping the whole stack there avoids a second-region deployment.
 
+Note: CloudFront's Origin Access Control signs every request to the `/api/*` origin with
+SigV4 before forwarding it to the Lambda Function URL, which overwrites any viewer-supplied
+`Authorization` header — so this path cannot carry client auth (e.g. a bearer token) via
+that header; a custom header would be required instead.
+
+Decision: no CloudFront custom error responses. `errorResponses` is configured
+per-distribution, not per-behavior, so mapping 403/404 to the SPA to fix `/studio` deep
+links would also rewrite `/api/*` JSON errors (e.g. handler.mjs's 404 "Unknown tool") into
+200 HTML responses — the hosted SPA is served at `/` only, and `/studio` is a local-bridge
+path (`bridge.mjs`), not a hosted one.
+
 ### 2.1 Rejected alternatives, and why
 
 **Lambda-only, no S3 or CloudFront.** `bridge.mjs` already serves both the HTML and the
@@ -249,7 +260,7 @@ Because §3 is a **pure extraction** with no intended logic change, the stronges
 guarantee is byte-identical output:
 
 1. Before modifying any file, run all five tools through the current `server.mjs` and
-   capture exact output strings to `test/golden/*.txt`.
+   capture exact output strings to `fixtures/golden/*.txt`.
 2. Perform the refactor.
 3. Assert `tools.mjs` produces byte-identical output.
 
@@ -293,7 +304,7 @@ all eight is cheap insurance against an expensive failure.
 AO-CC-Studio-Portal/
 ├── tools.mjs  router.mjs  handler.mjs      new
 ├── server.mjs  bridge.mjs                  refactored
-├── test/golden/*.txt
+├── fixtures/golden/*.txt
 ├── tools.test.mjs  router.test.mjs  handler.test.mjs
 ├── test.mjs                                unchanged
 ├── infra/                                  new — CDK v2 (TypeScript)
