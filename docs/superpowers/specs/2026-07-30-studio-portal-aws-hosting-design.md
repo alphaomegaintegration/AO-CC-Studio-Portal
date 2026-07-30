@@ -373,9 +373,30 @@ Attaching `studio.<domain>` later requires a Route 53 hosted zone ($0.50/month),
 certificate in us-east-1, and adding an alias plus `domainNames` to the existing
 distribution. No rework of anything in this spec.
 
-**Repository visibility — default: stays public.** `AO-CC-Studio-Portal` is a public
-repo. Nothing in it is sensitive; `baseline.json` is explicitly labelled an illustrative
-sample for a fictional "First National". But a hosted client-demo surface combined with a
-public repo means anyone can read `routeQuestion` and see which eight questions map to
-which canned answers. This is a positioning judgment for AO, not a security defect. The
-default is to leave it public and accept that.
+**Repository visibility — decided: go private. Blocked on permissions.**
+
+`AO-CC-Studio-Portal` is currently **internet-public** and has been since 2026-07-23.
+Verified on 2026-07-30 by unauthenticated `curl` successfully retrieving `baseline.json`
+from `raw.githubusercontent.com`.
+
+A full-history scan across all branches found **no credentials** — no AWS keys, no
+tokens, no private keys. Nothing requires rotation. The exposure is intellectual
+property, not secrets: `routeQuestion` (the regex table mapping the eight demo questions
+to canned answers), `docs/ao-client-demo-script.md` (the client run-of-show), the
+complete `baseline.json`, and all five tool implementations.
+
+The decision is to make both this repo and `AO-CC-Discovery-Portal` private. It could not
+be executed: the transfer into the `alphaomegaintegration` org left the authoring account
+with `push` but **not `admin`** on the repos, and changing visibility requires repo admin.
+The org itself permits it (`members_can_change_repo_visibility: true`), so this is purely
+a per-repo permission grant.
+
+**Action required from an org owner**, either:
+
+1. Grant repo Admin on both repos — also needed for branch protection and for the deploy
+   environment/secrets in §7, so this is the preferable fix; or
+2. Change visibility directly via Settings → General → Danger Zone.
+
+This does not block the refactor or the CDK work, but it **should be resolved before the
+site is demoed to a client**, since the hosted URL plus a public repo lets a viewer read
+exactly how the demo is wired.
