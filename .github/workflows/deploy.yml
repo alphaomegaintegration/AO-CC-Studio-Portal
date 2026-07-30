@@ -1,0 +1,77 @@
+name: deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  id-token: write   # required for OIDC
+  contents: read
+
+concurrency:
+  group: deploy-studio
+  cancel-in-progress: false
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: Unit tests (golden, router, handler)
+        run: node --test
+      - name: MCP stdio harness
+        run: npm run test:mcp
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: us-east-1
+
+      - name: Install infra deps
+        working-directory: infra
+        run: npm ci
+
+      - name: CDK deploy
+        working-directory: infra
+        run: npx cdk deploy StudioPortalStack --require-approval never -c alarmEmail=${{ vars.ALARM_EMAIL }} --outputs-file out.json
+
+      - name: Read outputs
+        id: out
+        working-directory: infra
+        run: |
+          echo "url=$(jq -r '.StudioPortalStack.DistributionUrl' out.json)" >> "$GITHUB_OUTPUT"
+
+      - name: Smoke test the API
+        run: |
+          URL="${{ steps.out.outputs.url }}"
+          echo "Testing $URL"
+          for i in $(seq 1 10); do
+            code=$(curl -s -o /dev/null -w '%{http_code}' "$URL/api/health") && [ "$code" = "200" ] && break
+            echo "attempt $i: HTTP $code — waiting for distribution"
+            sleep 20
+          done
+          curl -sf "$URL/api/health" | jq -e '.ok == true'
+          curl -sf "$URL/api/ask" -H 'content-type: application/json' \
+            -d '{"question":"What happens if I remove the dormant status guard?"}' \
+            | jq -e '.text | test("NOT BEHAVIOR-PRESERVING")'
+          echo "Deployed: $URL"
+
+      - name: Summary
+        run: echo "### Studio Portal deployed → ${{ steps.out.outputs.url }}" >> "$GITHUB_STEP_SUMMARY"
