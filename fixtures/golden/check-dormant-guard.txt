@@ -1,0 +1,12 @@
+**Verdict: NOT BEHAVIOR-PRESERVING — route to change governance**
+
+**InterestAccrualService.accrueDaily** → R-CTRL-006 (Dormant Account Accrual Suppression) — matched via file InterestAccrualService.java, symbol InterestAccrualService.accrueDaily, lines 41–46 overlap bound region 41–49
+NOT BEHAVIOR-PRESERVING. The bound region implements a source-derived behavior verified by EQV-2272 (Verified · deterministic equivalence). The proposed change alters it: "Dormant accounts do not accrue daily interest." would no longer hold.
+This may be valid business policy — but it is not behavior-preserving. Required action: open a change-governance review to either reject the change or update the approved intent baseline (which retires/replaces EQV-2272 explicitly).
+Source lineage: ACCT-INTEREST.CBL lines 197–201 · Contract clause: Preserve dormant-account accrual suppression.
+
+**InterestAccrualService.accrueDaily** → R-CALC-002 (Daily Interest Accrual Basis) — matched via file InterestAccrualService.java, symbol InterestAccrualService.accrueDaily, lines 41–46 overlap bound region 41–49
+Touches the bound region but does not alter the guarded lines. Equivalence record EQV-2268 should be RE-RUN on commit to confirm preservation; the bound behavior ("Daily interest accrues on the collected balance using the 365-day method.") is the invariant being protected.
+---
+Baseline: CodeIntent 2026.06.r1 · First National (illustrative sample)
+Interface: governed evidence interface (read-only) · Sample baseline for product-surface demonstration. The production engine generates this record from the customer source codebase.

@@ -1933,9 +1933,7 @@ async function askCodeIntent(){
     if(!r.ok || j.error) throw new Error(j.error||'Ask CodeIntent failed');
     renderAskResult(q,j.text||'(no response)',{tool:j.tool});
   }catch(e){
-    renderAskResult(q,`MCP bridge unavailable. Start the local bridge with: npm run studio
-
-Built-in examples are still available on the left.
+    renderAskResult(q,`CodeIntent baseline temporarily unreachable — built-in examples remain available on the left.
 
 Error: ${e.message}`,{});
   }

@@ -1,0 +1,13 @@
+**Impact analysis — R-CTRL-006 (Dormant Account Accrual Suppression)**
+
+Bounded impact: 1 behavior, 3 call sites. No downstream accrual behavior affected.
+Evidence record that re-runs on change: EQV-2272 (Verified · deterministic equivalence)
+Impact fan (Fee-waiver flag):
+  - Accrual: 1 call site [unaffected]
+  - Posting: 2 call sites [re-validate]
+  - Statement: 1 call site [unaffected]
+Adjacent allowed-change surface: Ledger Posting adapter (Contract v1.1) — re-validate if posting amounts change.
+Provenance: Source-Derived — extracted directly from the legacy control branch and confirmed by deterministic equivalence.
+---
+Baseline: CodeIntent 2026.06.r1 · First National (illustrative sample)
+Interface: governed evidence interface (read-only) · Sample baseline for product-surface demonstration. The production engine generates this record from the customer source codebase.

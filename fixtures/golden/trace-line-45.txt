@@ -1,0 +1,16 @@
+Lineage for **InterestAccrualService.java** line 45:
+
+**R-CTRL-006 — Dormant Account Accrual Suppression**
+Rule: Dormant accounts do not accrue daily interest.
+Provenance: Source-Derived — extracted directly from the legacy control branch and confirmed by deterministic equivalence.
+Rule source: ACCT-INTEREST.CBL · paragraph 2100-ACCRUE-DAILY
+Governance contract clause: Preserve dormant-account accrual suppression.
+Validation: Verified · deterministic equivalence
+Evidence record: EQV-2272 — Pass (deterministic equivalence)
+Source: ACCT-INTEREST.CBL lines 197–201
+Target: InterestAccrualService.java lines 44–47
+Evidence detail: Result: Equivalence — Pass · Coverage: Branch + path · Last validated: 2026-06-08 · Versions: src r9 → tgt v1.0
+Bounded impact: Bounded impact: 1 behavior, 3 call sites. No downstream accrual behavior affected.
+---
+Baseline: CodeIntent 2026.06.r1 · First National (illustrative sample)
+Interface: governed evidence interface (read-only) · Sample baseline for product-surface demonstration. The production engine generates this record from the customer source codebase.

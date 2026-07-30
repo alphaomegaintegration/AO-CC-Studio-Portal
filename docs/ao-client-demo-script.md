@@ -7,7 +7,10 @@ Total runtime ~15 minutes.
 
 ## Pre-flight (before the client joins)
 
-Run `npm run studio`, open <http://127.0.0.1:8787/studio>, click **Ask CodeIntent**, and confirm the status strip reads:
+Local bridge: run `npm run studio`, open <http://127.0.0.1:8787/studio>. Hosted demo:
+open the CloudFront distribution URL's root — `<hosted-url>/`, not `/studio` — since
+CloudFront only serves the Studio HTML at the root path. Either way, click
+**Ask CodeIntent** and confirm the status strip reads:
 
 ```text
 MCP bridge: connected · CodeIntent 2026.06.r1 · read-only

@@ -75,3 +75,6 @@ out/
 ehthumbs.db
 Thumbs.db
 desktop.ini
+
+# Subagent-driven-development scratch workspace
+.superpowers/

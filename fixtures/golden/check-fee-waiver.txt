@@ -1,0 +1,6 @@
+**Verdict: NO BOUND BEHAVIOR AFFECTED (advisory pass)**
+
+The proposed change does not touch any symbol, file, or line region bound in this baseline. No source-derived behavior is at risk. Note: in this sample baseline only the pinned demo codebase is bound; a production baseline binds the full codebase.
+---
+Baseline: CodeIntent 2026.06.r1 · First National (illustrative sample)
+Interface: governed evidence interface (read-only) · Sample baseline for product-surface demonstration. The production engine generates this record from the customer source codebase.

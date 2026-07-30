@@ -28,7 +28,7 @@ codeintent_product_build/
 ├── baseline.json                Shared sample CodeIntent baseline
 ├── package.json                 Node scripts/dependencies
 ├── package-lock.json            Locked dependencies
-├── test.mjs                     MCP test harness
+├── mcp-harness.mjs              MCP test harness
 ├── docs/
 │   └── ao-client-demo-script.md AO client demo script (~15 min run of show)
 └── demo-workspace/              Small workspace for Claude Code / VS Code demos
@@ -60,6 +60,11 @@ Open:
 ```text
 http://127.0.0.1:8787/studio
 ```
+
+(This local bridge path is only valid when running `npm run studio` on your own
+machine. If you're pointed at a hosted demo instead, open the distribution URL's
+root — `<hosted-url>/` — not `/studio`; CloudFront only serves the Studio HTML at
+the root path.)
 
 In the **Ask CodeIntent** page, the status strip should show:
 
