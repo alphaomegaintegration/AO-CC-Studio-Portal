@@ -19,7 +19,7 @@
 - `FOOTER` is appended inside `tools.mjs`, never in a transport.
 - The Lambda bundle must include `zod` and must **exclude** `@modelcontextprotocol/sdk`.
 - The Lambda emits **no CORS headers**. SPA and API are same-origin via CloudFront.
-- Tasks 1–3 must not change any tool's output text by even one byte. Golden tests enforce this.
+- Tasks 1–2 must not change any tool's output text by even one byte. Golden tests enforce this.
 - `server.mjs` keeps its stdio entrypoint and its externally-observable behavior throughout. `npm run test:mcp` must pass at the end of every task.
 - Never commit AWS credentials. Deploys authenticate by OIDC role assumption.
 
@@ -185,7 +185,7 @@ the correctness criterion for the tools.mjs extraction."
 
 ---
 
-### Task 2: Extract `tools.mjs`
+### Task 2: Extract `tools.mjs` and reduce `server.mjs`
 
 **Files:**
 - Create: `tools.mjs`
@@ -352,36 +352,14 @@ diff fixtures/golden/check-dormant-guard.txt /tmp/actual.txt
 
 The most likely causes are a missed `+ FOOTER`, or a `text()` call left in place.
 
-- [ ] **Step 5: Confirm nothing else broke yet**
+- [ ] **Step 5: Reduce `server.mjs` to a thin stdio shell**
 
-Run: `npm run test:mcp`
-Expected: PASS — `server.mjs` is still untouched at this point.
+The originals must be deleted in this same task. Leaving `server.mjs` intact would
+leave ~250 lines of logic existing in two places, which is a defect regardless of the
+fact that a later task would have cleaned it up.
 
-- [ ] **Step 6: Commit**
-
-```bash
-git add tools.mjs tools.test.mjs
-git commit -m "refactor: extract tool implementations into tools.mjs
-
-Transport-agnostic registry of the five CodeIntent tools. run() returns a
-plain string with FOOTER appended, so stdio, the local bridge and Lambda
-all emit identical text. Golden tests assert byte-identical output."
-```
-
----
-
-### Task 3: Reduce `server.mjs` to a thin stdio shell
-
-**Files:**
-- Modify: `server.mjs` (replace lines 21–345, keep the header comment)
-
-**Interfaces:**
-- Consumes: `TOOLS` from `tools.mjs`.
-- Produces: no new exports. `server.mjs` remains a side-effecting entrypoint that must never be imported.
-
-- [ ] **Step 1: Rewrite `server.mjs`**
-
-Keep the existing lines 1–19 header comment verbatim, then replace everything from line 21 to the end:
+Keep the existing lines 1–19 header comment verbatim, then replace everything from
+line 21 to the end of `server.mjs`:
 
 ```js
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
@@ -403,7 +381,7 @@ await server.connect(transport);
 console.error(`[codeintent-mcp] serving baseline ${B.meta.baseline_id} (read-only evidence interface)`);
 ```
 
-- [ ] **Step 2: Verify the MCP surface is unchanged**
+- [ ] **Step 6: Verify the MCP surface is unchanged**
 
 Run: `npm run test:mcp`
 Expected: PASS, and the first line must still read:
@@ -414,12 +392,13 @@ TOOLS: get_baseline_summary, explain_rule, trace_lineage, check_change, impact_a
 
 Tool *order* comes from `Object.keys(TOOLS)` insertion order, so `tools.mjs` must define them in that sequence. If the order differs, reorder the registry rather than the test.
 
-- [ ] **Step 3: Verify the golden tests still pass**
+- [ ] **Step 7: Verify the golden tests still pass**
 
 Run: `node --test`
-Expected: PASS.
+Expected: PASS. The extraction is only correct if both the golden tests and the MCP
+harness pass against the *same* code.
 
-- [ ] **Step 4: Verify the real MCP client path by hand**
+- [ ] **Step 8: Verify the real MCP client path by hand**
 
 Run:
 ```bash
@@ -427,20 +406,32 @@ echo '{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}' | node server.
 ```
 Expected: a JSON-RPC response listing five tools. This confirms the server still speaks the protocol on stdio, which is what Claude Code and `demo-workspace/.vscode/mcp.json` rely on.
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 9: Confirm no logic survives in duplicate**
+
+Run: `grep -c "function ruleBlock\|function detectTouched\|function alterationCues" server.mjs`
+Expected: `0` — every helper now lives only in `tools.mjs`.
+
+Run: `wc -l server.mjs`
+Expected: roughly 40–60 lines.
+
+- [ ] **Step 10: Commit**
 
 ```bash
-git add server.mjs
-git commit -m "refactor: reduce server.mjs to a thin stdio MCP shell
+git add tools.mjs tools.test.mjs server.mjs
+git commit -m "refactor: extract tool implementations into tools.mjs
 
-Registers the five tools from tools.mjs and wraps each result in the MCP
-content envelope. External behavior is unchanged; test:mcp still passes,
-so the Claude Code and VS Code demo paths are unaffected."
+Transport-agnostic registry of the five CodeIntent tools. run() returns a
+plain string with FOOTER appended, so stdio, the local bridge and Lambda
+all emit identical text. server.mjs becomes a thin shell that registers
+them and wraps results in the MCP content envelope.
+
+Golden tests assert byte-identical output; test:mcp confirms the Claude
+Code and VS Code demo paths are unaffected."
 ```
 
 ---
 
-### Task 4: Extract `router.mjs`
+### Task 3: Extract `router.mjs`
 
 **Files:**
 - Create: `router.mjs`
@@ -552,7 +543,7 @@ unpinned regression would only surface during a live demo."
 
 ---
 
-### Task 5: Rewire `bridge.mjs` to call tools in-process
+### Task 4: Rewire `bridge.mjs` to call tools in-process
 
 **Files:**
 - Modify: `bridge.mjs` (remove lines 14-15, 53-64, 66-120; rewire the handlers)
@@ -635,7 +626,7 @@ tools.mjs directly. Same HTTP contract, materially faster locally."
 
 ---
 
-### Task 6: Add the Lambda handler
+### Task 5: Add the Lambda handler
 
 **Files:**
 - Create: `handler.mjs`
@@ -849,7 +840,7 @@ and no CORS headers."
 
 ---
 
-### Task 7: Fix the offline-fallback copy in the SPA
+### Task 6: Fix the offline-fallback copy in the SPA
 
 **Files:**
 - Modify: `studio_product.html:1938`
@@ -898,7 +889,7 @@ on a hosted demo."
 
 ---
 
-### Task 8: CDK stack
+### Task 7: CDK stack
 
 **Files:**
 - Create: `infra/package.json`, `infra/tsconfig.json`, `infra/cdk.json`
@@ -1211,13 +1202,13 @@ concurrency 5, price class 100, and a \$5 billing alarm."
 
 ---
 
-### Task 9: GitHub Actions deploy workflow
+### Task 8: GitHub Actions deploy workflow
 
 **Files:**
 - Create: `.github/workflows/deploy.yml`
 
 **Interfaces:**
-- Consumes: the `studio-portal-github-deploy` role ARN from Task 8's OIDC stack, stored as repo variable `AWS_DEPLOY_ROLE_ARN`; repo variable `ALARM_EMAIL`.
+- Consumes: the `studio-portal-github-deploy` role ARN from Task 7's OIDC stack, stored as repo variable `AWS_DEPLOY_ROLE_ARN`; repo variable `ALARM_EMAIL`.
 - Produces: a deployed stack and a smoke-tested URL.
 
 - [ ] **Step 1: Write the workflow**
