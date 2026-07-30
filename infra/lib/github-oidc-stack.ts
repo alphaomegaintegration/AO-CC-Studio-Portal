@@ -14,10 +14,18 @@ export class GithubOidcStack extends Stack {
     const role = new iam.Role(this, 'DeployRole', {
       roleName: 'studio-portal-github-deploy',
       assumedBy: new iam.OpenIdConnectPrincipal(provider, {
-        StringEquals: { 'token.actions.githubusercontent.com:aud': 'sts.amazonaws.com' },
-        StringLike: {
+        // StringEquals (not StringLike) for both conditions: `sub` is now a
+        // single fully-qualified value with no wildcard, so an exact-match
+        // operator is the tighter and clearer choice. This restricts the
+        // trust to pushes/dispatches against `main` only — the deploy
+        // workflow only runs on `main` and `workflow_dispatch`, so nothing
+        // legitimate is broken, and a branch push can no longer assume this
+        // role (which can in turn assume the AdministratorAccess-by-default
+        // CDK bootstrap exec role).
+        StringEquals: {
+          'token.actions.githubusercontent.com:aud': 'sts.amazonaws.com',
           'token.actions.githubusercontent.com:sub':
-            'repo:alphaomegaintegration/AO-CC-Studio-Portal:*',
+            'repo:alphaomegaintegration/AO-CC-Studio-Portal:ref:refs/heads/main',
         },
       }),
       description: 'Deploys the Studio Portal from GitHub Actions',

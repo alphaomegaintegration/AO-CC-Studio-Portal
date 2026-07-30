@@ -104,7 +104,7 @@ export class StudioPortalStack extends Stack {
 
     /* ---------- ship the SPA ---------- */
     new s3deploy.BucketDeployment(this, 'DeploySite', {
-      sources: [s3deploy.Source.asset(repoRoot, { exclude: ['*', '!studio_product.html'] })],
+      sources: [s3deploy.Source.asset(repoRoot, { exclude: ['*', '.*', '!studio_product.html'] })],
       destinationBucket: bucket,
       distribution,
       distributionPaths: ['/*'],
@@ -130,7 +130,8 @@ export class StudioPortalStack extends Stack {
       threshold: 5,
       evaluationPeriods: 1,
       comparisonOperator: cw.ComparisonOperator.GREATER_THAN_THRESHOLD,
-      alarmDescription: 'Studio Portal estimated charges exceeded $5 — expected steady state is $0.',
+      treatMissingData: cw.TreatMissingData.BREACHING,
+      alarmDescription: 'AWS account-wide estimated charges (all services, not just Studio Portal) exceeded $5 — expected steady state is $0. Also fires if the metric stops publishing (e.g. "Receive Billing Alerts" is disabled), since a silent metric is itself a signal something is wrong.',
     }).addAlarmAction(new cwActions.SnsAction(topic));
 
     new CfnOutput(this, 'DistributionUrl', { value: `https://${distribution.distributionDomainName}` });
