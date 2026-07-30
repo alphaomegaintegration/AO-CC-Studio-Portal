@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { handler } from "./handler.mjs";
+import { TOOLS } from "./tools.mjs";
 
 const evt = (method, path, body) => ({
   requestContext: { http: { method, path } },
@@ -77,4 +78,37 @@ test("base64-encoded bodies are decoded", async () => {
   const r = await handler(e);
   assert.equal(r.statusCode, 200);
   assert.equal(JSON.parse(r.body).tool, "get_baseline_summary");
+});
+
+test("literal JSON null body is 400, not 500", async () => {
+  const r = await handler(evt("POST", "/api/ask", null));
+  assert.equal(r.statusCode, 400);
+  const r2 = await handler(evt("POST", "/api/tool", null));
+  assert.equal(r2.statusCode, 400);
+});
+
+test("unexpected throw yields generic 500, never leaking the real error", async () => {
+  const original = TOOLS.get_baseline_summary.run;
+  TOOLS.get_baseline_summary.run = async () => {
+    throw new Error("SECRET_INTERNAL_DETAIL: table foo missing column bar");
+  };
+  try {
+    const r = await handler(evt("POST", "/api/ask", {
+      question: "What baseline governs this application?",
+    }));
+    assert.equal(r.statusCode, 500);
+    const b = JSON.parse(r.body);
+    assert.equal(b.error, "Internal error");
+    assert.ok(!r.body.includes("SECRET_INTERNAL_DETAIL"));
+  } finally {
+    TOOLS.get_baseline_summary.run = original;
+  }
+});
+
+test("oversized base64-encoded body is 413 — cap applies to decoded size", async () => {
+  const e = evt("POST", "/api/ask", { question: "x".repeat(40_000) });
+  e.body = Buffer.from(e.body).toString("base64");
+  e.isBase64Encoded = true;
+  const r = await handler(e);
+  assert.equal(r.statusCode, 413);
 });

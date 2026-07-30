@@ -31,13 +31,25 @@ function readBody(event) {
     e.statusCode = 413;
     throw e;
   }
+  let parsed;
   try {
-    return JSON.parse(raw);
+    parsed = JSON.parse(raw);
   } catch {
     const e = new Error("Invalid JSON");
     e.statusCode = 400;
     throw e;
   }
+  /* JSON `null` parses fine but is not a usable request body — treat it as
+     absent/invalid input rather than letting `body.question`/`body.tool`
+     throw a TypeError downstream. Primitives (numbers, strings) and arrays
+     are left as-is: they safely produce `undefined` field access, which the
+     route handlers already turn into ordinary 400s (e.g. "Missing question"). */
+  if (parsed === null) {
+    const e = new Error("Invalid JSON");
+    e.statusCode = 400;
+    throw e;
+  }
+  return parsed;
 }
 
 export const handler = async (event) => {
