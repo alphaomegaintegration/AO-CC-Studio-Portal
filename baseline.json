@@ -1,6 +1,6 @@
 {
   "meta": {
-    "product": "Holonic CodeIntent",
+    "product": "Continuum Code",
     "baseline_id": "CodeIntent 2026.06.r1",
     "client": "First National (illustrative sample)",
     "job": "Core Deposit Platform -> Java Spring Boot",
@@ -492,7 +492,7 @@
       "rule": "Each accrual posting emits an AccrualAudited domain event.",
       "origin": "net",
       "originText": "Net-New Intent — no legacy origin. Added under the output model for observability and governed by contract, not equivalence.",
-      "ruleSrc": "none (net-new) · introduced by Holonic Java SB Standard Model v1.0",
+      "ruleSrc": "none (net-new) · introduced by Continuum Java SB Standard Model v1.0",
       "clause": "Net-new audit event for accrual posting (Contract v1.2).",
       "status": "net",
       "valStatus": "Contract conformance · no source equivalence",

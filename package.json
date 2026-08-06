@@ -1,7 +1,7 @@
 {
   "name": "codeintent-studio-product-build",
   "version": "1.0.0",
-  "description": "Holonic CodeIntent Studio product-build demo with local MCP bridge",
+  "description": "Continuum Code Studio product-build demo with local MCP bridge",
   "type": "module",
   "main": "bridge.mjs",
   "scripts": {
@@ -14,7 +14,7 @@
     "mcp",
     "studio"
   ],
-  "author": "Holonic",
+  "author": "Continuum Code",
   "license": "UNLICENSED",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",

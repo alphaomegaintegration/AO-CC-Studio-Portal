@@ -1,8 +1,10 @@
 #!/usr/bin/env node
 /**
- * Holonic CodeIntent — MCP Evidence Interface (prototype)
+ * Continuum Code — MCP Evidence Interface (prototype)
  * -------------------------------------------------------
- * A read-only MCP server exposing the CodeIntent semantic baseline to
+ * developer tools (Claude Code, VS Code Copilot agent mode, etc.).
+ *
+ * Note: This is a prototype server for Continuum Code.
  * developer tools (Claude Code, VS Code Copilot agent mode, etc.).
  *
  * The baseline behind this server is the SAME sample codebase rendered by

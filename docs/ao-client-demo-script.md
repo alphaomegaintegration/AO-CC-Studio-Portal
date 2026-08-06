@@ -69,7 +69,7 @@ What happens if I remove the dormant status guard?
 
 **Say:**
 
-> "That's `check_change`, one of five read-only MCP tools. Verdict: **NOT BEHAVIOR-PRESERVING — route to change governance.** It's an advisory evidence check — it doesn't modify or block anything; it determines what evidence a change requires and fails explicitly when a verified behavior would be altered. Any coding agent — Claude Code, Copilot — queries this same baseline over MCP. LLMs propose. Holonic verifies."
+> "That's `check_change`, one of five read-only MCP tools. Verdict: **NOT BEHAVIOR-PRESERVING — route to change governance.** It's an advisory evidence check — it doesn't modify or block anything; it determines what evidence a change requires and fails explicitly when a verified behavior would be altered. Any coding agent — Claude Code, Copilot — queries this same baseline over MCP. LLMs propose. Continuum Code verifies."
 
 ## 6. Verification & Governed Boundaries — 2 min
 

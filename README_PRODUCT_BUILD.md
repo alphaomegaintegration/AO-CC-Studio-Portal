@@ -1,4 +1,4 @@
-# Holonic CodeIntent Studio — Product Build + Local MCP Bridge
+# Continuum Code Studio — Product Build + Local MCP Bridge
 
 This bundle contains a cleaned product-build version of CodeIntent Studio and the local MCP files needed to make the **Ask CodeIntent** section query the same baseline used by Claude Code / VS Code.
 
