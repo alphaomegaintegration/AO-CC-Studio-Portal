@@ -1,0 +1,15 @@
+.git
+.gitignore
+.DS_Store
+.env
+.env.*
+node_modules
+npm-debug.log*
+coverage
+test-output
+*.pid
+*.log
+*.tmp
+docs
+demo-workspace
+README*.md
