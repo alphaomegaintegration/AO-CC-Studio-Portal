@@ -178,3 +178,67 @@ The generated URLs are publicly reachable. Before a client demonstration, I reco
 At low traffic, with two continuously running `0.25 vCPU/0.5 GB` tasks sharing one load balancer, a rough `us-east-1` estimate is approximately **$35–$45/month**, plus logs and data transfer. This is inferred from current [Fargate pricing](https://aws.amazon.com/fargate/pricing/) and [load-balancer pricing](https://aws.amazon.com/elasticloadbalancing/pricing/).
 
 I would not start a new implementation on App Runner: AWS stopped accepting new App Runner customers on March 31, 2026 and directs new container deployments toward ECS Express Mode.
+
+### 8. AWS CLI Output
+#### Profile
+We use Continuum Labs
+
+aws sso login --profile ao-cc-studio-portal
+
+aws sts get-caller-identity --profile ao-cc-studio-portal
+{
+    "UserId": "AROA5YN4EQQBXTFVCO2Q2:Nabil.Sleiman@alphaomega.com",
+    "Account": "945824236547",
+    "Arn": "arn:aws:sts::945824236547:assumed-role/AWSReservedSSO_AdministratorAccess_7a64ef2812eeea03/Nabil.Sleiman@alphaomega.com"
+}
+
+#### AWS Repositories
+```bash
+aws ecr create-repository \
+  --repository-name ao-cc-studio \
+  --image-scanning-configuration scanOnPush=true \
+  --region "$DEPLOY_REGION"
+
+{
+    "repository": {
+        "repositoryArn": "arn:aws:ecr:us-east-1:945824236547:repository/ao-cc-studio",
+        "registryId": "945824236547",
+        "repositoryName": "ao-cc-studio",
+        "repositoryUri": "945824236547.dkr.ecr.us-east-1.amazonaws.com/ao-cc-studio",
+        "createdAt": "2026-08-07T15:27:49.393000-04:00",
+        "imageTagMutability": "MUTABLE",
+        "imageScanningConfiguration": {
+            "scanOnPush": true
+        },
+        "encryptionConfiguration": {
+            "encryptionType": "AES256"
+        }
+    }
+}
+
+aws ecr create-repository \
+  --repository-name ao-cc-discovery \
+  --image-scanning-configuration scanOnPush=true \
+  --region "$DEPLOY_REGION"
+
+  {
+    "repository": {
+        "repositoryArn": "arn:aws:ecr:us-east-1:945824236547:repository/ao-cc-discovery",
+        "registryId": "945824236547",
+        "repositoryName": "ao-cc-discovery",
+        "repositoryUri": "945824236547.dkr.ecr.us-east-1.amazonaws.com/ao-cc-discovery",
+        "createdAt": "2026-08-07T15:31:33.444000-04:00",
+        "imageTagMutability": "MUTABLE",
+        "imageScanningConfiguration": {
+            "scanOnPush": true
+        },
+        "encryptionConfiguration": {
+            "encryptionType": "AES256"
+        }
+    }
+}
+
+```
+
+
+
