@@ -240,5 +240,167 @@ aws ecr create-repository \
 
 ```
 
+### ECS Express Mode
+
+You’re on the correct **ECS Express Mode** page. The red box only means that the container image has not yet been selected.
+
+#### For the **Studio Portal**, enter the following:
+
+1. Click **Browse ECR images**.
+
+2. Select:
+
+   * Repository: `ao-cc-studio`
+   * Image: your uploaded image
+   * Select image by: **Image tag**
+   * Tag: `v1`
+
+   If `ao-cc-studio` or `v1` is not listed, the image has not yet been pushed to ECR.
+
+3. Leave **Private registry authentication** unchecked. Amazon ECR does not require this option.
+
+4. Keep both role selections as:
+
+   ```text
+   Task execution role: Create new role
+   Infrastructure role: Create new role
+   ```
+
+   Do not click the separate blue **Create new role** buttons. AWS will create the standard roles automatically when you click the final orange **Create** button. [AWS confirms this behavior](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/express-service-first-run.html).
+
+5. Expand **Additional configurations** and enter:
+
+| Setting           | Studio value           |
+| ----------------- | ---------------------- |
+| Cluster           | `default`              |
+| Name              | `ao-cc-studio`         |
+| Container port    | `8787`                 |
+| Health-check path | `/api/health`          |
+| Command           | Leave blank            |
+| Task role         | Leave blank            |
+| CPU               | `0.25 vCPU` if offered |
+| Memory            | `0.5 GB` if offered    |
+| Minimum tasks     | `1`                    |
+| Maximum tasks     | `2`                    |
+
+Add these environment variables as ordinary **Environment variable** values:
+
+| Key        | Value        |
+| ---------- | ------------ |
+| `NODE_ENV` | `production` |
+| `HOST`     | `0.0.0.0`    |
+| `PORT`     | `8787`       |
+
+Leave networking and logs at their defaults for the initial deployment. The important part is changing the container port from AWS’s default `80` to `8787`; AWS requires the port to match the port on which the application listens. [AWS configuration guide](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/express-service-first-run.html#express-service-first-run).
+
+Then click the orange **Create** button. Once deployment completes, open the generated Application URL with:
+
+```text
+/studio
+```
+
+For example:
+
+```text
+https://<generated-application-url>/studio
+```
+
+That is normal. The Studio deployment created these two roles automatically, so Discovery now sees and reuses them:
+
+```text
+ecsTaskExecutionRole
+ecsInfrastructureRoleForExpressServices
+```
+
+Do not click either **Create new role** button. It may fail because roles with those names already exist. Leave both existing roles selected and click the final orange **Create** button.
+
+#### For Discovery, use:
+
+| Setting             | Value                                     |
+| ------------------- | ----------------------------------------- |
+| Image               | `ao-cc-discovery:v1`                      |
+| Task execution role | `ecsTaskExecutionRole`                    |
+| Infrastructure role | `ecsInfrastructureRoleForExpressServices` |
+| Cluster             | `default`                                 |
+| Name                | `ao-cc-discovery`                         |
+| Container port      | `4173`                                    |
+| Health-check path   | `/`                                       |
+
+Environment variables:
+
+```text
+NODE_ENV=production
+HOST=0.0.0.0
+PORT=4173
+PORTAL_PROJECT=aws-carddemo-preview
+```
+
+Why it looked different for Studio: no roles existed during the first deployment, so Express Mode created them behind the scenes. Now they appear in the dropdowns for subsequent services. AWS expects these roles to be reusable across Express Mode services. [AWS Express Mode documentation](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/express-service-getting-started.html)
+
+If clicking the final orange **Create** still fails, send me the exact red error or a screenshot of it—the current screenshot shows the correct role selections.
 
 
+### To pause Studio, explicitly set its **desired task count** to zero:
+
+```bash
+aws ecs update-service \
+  --cluster default \
+  --service ao-cc-studio \
+  --desired-count 0 \
+  --region us-east-1 \
+  --profile ao-cc-studio-portal
+```
+
+Then verify:
+
+```bash
+aws ecs describe-services \
+  --cluster default \
+  --services ao-cc-studio \
+  --query 'services[0].{Desired:desiredCount,Running:runningCount,Pending:pendingCount}' \
+  --output table \
+  --region us-east-1 \
+  --profile ao-cc-studio-portal
+```
+
+The final result should be:
+
+```text
+Desired  0
+Running  0
+Pending  0
+```
+
+Do the same for Discovery:
+
+```bash
+aws ecs update-service \
+  --cluster default \
+  --service ao-cc-discovery \
+  --desired-count 0 \
+  --region us-east-1 \
+  --profile ao-cc-studio-portal
+```
+
+Setting autoscaling’s minimum to `0` only allows the service to reach zero; it does not automatically change the current desired count. Changing `desired-count` does not force a new deployment. [AWS CLI documentation](https://docs.aws.amazon.com/cli/latest/reference/ecs/update-service.html)
+
+If both services show `Desired: 0`, the error may remain visible in the event history, but you can ignore it—ECS will stop trying to start the task.
+
+When restarting later, set minimum capacity back to `1`, then:
+
+```bash
+aws ecs update-service \
+  --cluster default \
+  --service ao-cc-studio \
+  --desired-count 1 \
+  --region us-east-1 \
+  --profile ao-cc-studio-portal
+```
+
+If the ECR timeout reappears repeatedly when restarting, the service’s task subnet lacks reliable outbound HTTPS access. It would need either:
+
+* A public IP and Internet Gateway route, or
+* A NAT Gateway, or
+* ECR API, ECR Docker, and S3 VPC endpoints.
+
+AWS identifies this exact `dial tcp ... i/o timeout` condition as a network route/connectivity problem between the task and ECR. [AWS ECS troubleshooting](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_cannot_pull_image.html) Since Studio previously deployed successfully, a single occurrence may simply have been transient.
