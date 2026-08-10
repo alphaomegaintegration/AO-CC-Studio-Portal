@@ -183,9 +183,13 @@ I would not start a new implementation on App Runner: AWS stopped accepting new 
 #### Profile
 We use Continuum Labs
 
+#### To login
+```bash
 aws sso login --profile ao-cc-studio-portal
 
 aws sts get-caller-identity --profile ao-cc-studio-portal
+```
+
 {
     "UserId": "AROA5YN4EQQBXTFVCO2Q2:Nabil.Sleiman@alphaomega.com",
     "Account": "945824236547",
@@ -404,3 +408,12 @@ If the ECR timeout reappears repeatedly when restarting, the service’s task su
 * ECR API, ECR Docker, and S3 VPC endpoints.
 
 AWS identifies this exact `dial tcp ... i/o timeout` condition as a network route/connectivity problem between the task and ECR. [AWS ECS troubleshooting](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_cannot_pull_image.html) Since Studio previously deployed successfully, a single occurrence may simply have been transient.
+
+See JIRA comment: https://aoi.atlassian.net/browse/AOR-76?focusedCommentId=13906
+
+The public portals on AWS:
+
+[Studio](https://ao-78c43796787949bc864df73a867a6424.ecs.us-east-1.on.aws/)
+
+[Discovery](https://ao-0e969d8c8f8448b4b426f2b6e0e593eb.ecs.us-east-1.on.aws/)
+
