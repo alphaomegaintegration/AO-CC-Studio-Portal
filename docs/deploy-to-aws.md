@@ -411,3 +411,9 @@ AWS identifies this exact `dial tcp ... i/o timeout` condition as a network rout
 
 See JIRA comment: https://aoi.atlassian.net/browse/AOR-76?focusedCommentId=13906
 
+The public portals on AWS:
+
+[Studio](https://ao-78c43796787949bc864df73a867a6424.ecs.us-east-1.on.aws/)
+
+[Discovery](https://ao-0e969d8c8f8448b4b426f2b6e0e593eb.ecs.us-east-1.on.aws/)
+
