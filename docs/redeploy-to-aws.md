@@ -23,7 +23,7 @@ CC_TASK_DEFINITION=$(aws ecs describe-services \
   --services ao-cc-studio \
   --region us-east-1 \
   --profile ao-cc-studio-portal \
-  --query 'services[0].taskDefinition' \
+  --qquery 'services[0].deployments[?status==`PRIMARY`].taskDefinition | [0]' \
   --output text)
 
 aws ecs describe-task-definition \

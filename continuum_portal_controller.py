@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Continuum Code Portal Controller.
+"""
+Continuum Code Portal Controller.
 
 A small desktop GUI for authorized AO programmers to start and stop the
 Continuum Code Studio and Discovery ECS services.

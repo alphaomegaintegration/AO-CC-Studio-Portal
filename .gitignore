@@ -75,3 +75,10 @@ out/
 ehthumbs.db
 Thumbs.db
 desktop.ini
+
+__pycache__/
+*.py[cod]
+.DS_Store
+*.app/
+*.zip
+*.log
